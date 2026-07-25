@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101a30" />
+    <title>Admin Dashboard | Mahadev Smart Services</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <main class="login-shell" id="login-shell">
+      <a class="back-home" href="index.html">← Back to website</a>
+      <section class="login-card"><div class="admin-mark">M</div><p class="eyebrow">MAHADEV SMART SERVICES</p><h1>Admin control centre</h1><p>Enter your secure dashboard token to manage customer service requests.</p><form id="login-form"><label>Admin token<input id="admin-token" type="password" autocomplete="current-password" placeholder="Your ADMIN_TOKEN" required /></label><button type="submit">Open dashboard <span>→</span></button></form><small>This starter uses the `ADMIN_TOKEN` from your environment settings.</small></section>
+    </main>
+
+    <div class="dashboard" id="dashboard" hidden>
+      <aside class="sidebar"><a class="admin-brand" href="index.html"><span>M</span><b>Mahadev<br /><em>Smart</em></b></a><p class="nav-label">WORKSPACE</p><a class="side-link active" href="#lead-board">◫ Lead board</a><a class="side-link" href="#campaigns">✦ Offer notifications</a><a class="side-link" href="#videos">▶ Service videos</a><div class="sidebar-bottom"><a href="index.html">↗ View public website</a><button id="logout">⇥ Sign out</button></div></aside>
+      <main class="dashboard-content"><header class="dashboard-header"><div><p class="eyebrow">SERVICE OPERATIONS</p><h1>Good morning, Mahadev.</h1><p>Keep every customer request moving with care.</p></div><button class="refresh-button" id="refresh-dashboard">↻ Refresh</button></header>
+        <section class="stat-grid"><article><span class="stat-icon orange">✦</span><p>New requests</p><b id="new-count">0</b><small>Waiting for first contact</small></article><article><span class="stat-icon blue">◌</span><p>Contacted</p><b id="contacted-count">0</b><small>Customer has been reached</small></article><article><span class="stat-icon purple">◴</span><p>In progress</p><b id="progress-count">0</b><small>Technician work underway</small></article><article><span class="stat-icon green">✓</span><p>Completed</p><b id="completed-count">0</b><small>Happy homes served</small></article></section>
+        <section class="section-card" id="lead-board"><div class="card-heading"><div><p class="eyebrow">CUSTOMER LEADS</p><h2>Service request board</h2></div><div class="conversation-count"><span>☏</span><div><b id="conversation-count">0</b><small>Chat conversations saved</small></div></div></div><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Service request</th><th>Location</th><th>Received</th><th>Source</th><th>Status</th></tr></thead><tbody id="lead-table"><tr><td colspan="6" class="empty-row">Loading your leads…</td></tr></tbody></table></div></section>
+        <div class="admin-grid"><section class="section-card" id="campaigns"><div class="card-heading"><div><p class="eyebrow">BROWSER NOTIFICATIONS</p><h2>Send an offer</h2></div><span class="soft-badge">Live to opted-in visitors</span></div><p class="section-intro">Send helpful festival offers, a first-order discount, or AMC reminders. Visitors who allow alerts will receive this on their next check-in.</p><form id="notification-form" class="admin-form"><label>Notification title<input name="title" maxlength="80" placeholder="Festival service offer" required /></label><label>Message<textarea name="body" maxlength="240" placeholder="Enjoy 15% off your first appliance service this week." required></textarea></label><button type="submit">Send notification <span>→</span></button></form><div class="recent-campaigns"><b>Recent campaigns</b><ul id="notification-list"><li>Nothing sent yet.</li></ul></div></section>
+          <section class="section-card" id="videos"><div class="card-heading"><div><p class="eyebrow">CONTENT LIBRARY</p><h2>Add service video</h2></div></div><p class="section-intro">Add a YouTube link or upload an MP4 to the public service guides section.</p><form id="video-form" class="admin-form" enctype="multipart/form-data"><label>Video title<input name="title" maxlength="120" placeholder="How to care for your appliance" required /></label><label>Video source<select name="type" id="video-type"><option value="youtube">YouTube link</option><option value="mp4">MP4 upload</option></select></label><label id="youtube-field">YouTube URL<input name="youtubeUrl" type="url" placeholder="https://www.youtube.com/watch?v=…" /></label><label id="mp4-field" hidden>MP4 file<input name="video" type="file" accept="video/mp4" /></label><button type="submit">Add video <span>→</span></button></form><div class="recent-campaigns"><b>Uploaded videos</b><ul id="video-list"><li>Loading videos…</li></ul></div></section></div>
+      </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>

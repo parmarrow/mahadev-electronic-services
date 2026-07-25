@@ -1,0 +1,132 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.9.0
+2 info using node@v24.14.0
+3 silly config load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\ASUS\Documents\Codex\2026-07-25\smart-ai-assistant-lead-system-create\.npmrc
+5 silly config load:file:C:\Users\ASUS\.npmrc
+6 silly config load:file:C:\Users\ASUS\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm install
+8 verbose argv "install" "--cache" "work\\npm-cache" "--no-audit" "--no-fund"
+9 verbose logfile logs-max:10 dir:C:\Users\ASUS\Documents\Codex\2026-07-25\smart-ai-assistant-lead-system-create\work\npm-cache\_logs\2026-07-25T11_08_20_439Z-
+10 verbose logfile C:\Users\ASUS\Documents\Codex\2026-07-25\smart-ai-assistant-lead-system-create\work\npm-cache\_logs\2026-07-25T11_08_20_439Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:2348810240 maxSize:587202560 maxEntrySize:293601280
+13 silly idealTree buildDeps
+14 silly fetch manifest multer@^2.0.2
+15 silly packumentCache full:https://registry.npmjs.org/multer cache-miss
+16 http cache https://registry.npmjs.org/multer 37ms (cache hit)
+17 silly packumentCache full:https://registry.npmjs.org/multer set size:156441 disposed:false
+18 silly placeDep ROOT multer@2.2.0 REPLACE for: mahadev-smart-assistant@1.0.0 want: ^2.0.2
+19 silly fetch manifest concat-stream@^2.0.0
+20 silly packumentCache full:https://registry.npmjs.org/concat-stream cache-miss
+21 http cache https://registry.npmjs.org/concat-stream 9ms (cache hit)
+22 silly packumentCache full:https://registry.npmjs.org/concat-stream set size:63783 disposed:false
+23 silly placeDep ROOT concat-stream@2.0.0 OK for: multer@2.2.0 want: ^2.0.0
+24 silly fetch manifest buffer-from@^1.0.0
+25 silly packumentCache full:https://registry.npmjs.org/buffer-from cache-miss
+26 silly fetch manifest readable-stream@^3.0.2
+27 silly packumentCache full:https://registry.npmjs.org/readable-stream cache-miss
+28 silly fetch manifest typedarray@^0.0.6
+29 silly packumentCache full:https://registry.npmjs.org/typedarray cache-miss
+30 http cache https://registry.npmjs.org/buffer-from 15ms (cache hit)
+31 silly packumentCache full:https://registry.npmjs.org/buffer-from set size:15463 disposed:false
+32 http cache https://registry.npmjs.org/typedarray 15ms (cache hit)
+33 silly packumentCache full:https://registry.npmjs.org/typedarray set size:18469 disposed:false
+34 http cache https://registry.npmjs.org/readable-stream 18ms (cache hit)
+35 silly packumentCache full:https://registry.npmjs.org/readable-stream set size:261096 disposed:false
+36 silly placeDep ROOT buffer-from@1.1.2 OK for: concat-stream@2.0.0 want: ^1.0.0
+37 silly placeDep ROOT readable-stream@3.6.2 OK for: concat-stream@2.0.0 want: ^3.0.2
+38 silly placeDep ROOT typedarray@0.0.6 OK for: concat-stream@2.0.0 want: ^0.0.6
+39 silly fetch manifest string_decoder@^1.1.1
+40 silly packumentCache full:https://registry.npmjs.org/string_decoder cache-miss
+41 silly fetch manifest util-deprecate@^1.0.1
+42 silly packumentCache full:https://registry.npmjs.org/util-deprecate cache-miss
+43 http cache https://registry.npmjs.org/string_decoder 9ms (cache hit)
+44 silly packumentCache full:https://registry.npmjs.org/string_decoder set size:28441 disposed:false
+45 http cache https://registry.npmjs.org/util-deprecate 10ms (cache hit)
+46 silly packumentCache full:https://registry.npmjs.org/util-deprecate set size:6674 disposed:false
+47 silly placeDep ROOT string_decoder@1.3.0 OK for: readable-stream@3.6.2 want: ^1.1.1
+48 silly placeDep ROOT util-deprecate@1.0.2 OK for: readable-stream@3.6.2 want: ^1.0.1
+49 silly reify mark retired [
+49 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\concat-stream'
+49 silly reify ]
+50 silly reify mark retired [
+50 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\core-util-is'
+50 silly reify ]
+51 silly reify mark retired [
+51 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\isarray'
+51 silly reify ]
+52 silly reify mark retired [
+52 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\minimist'
+52 silly reify ]
+53 silly reify mark retired [
+53 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\mkdirp',
+53 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.bin\\mkdirp',
+53 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.bin\\mkdirp.cmd',
+53 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.bin\\mkdirp.ps1'
+53 silly reify ]
+54 silly reify mark retired [
+54 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\multer'
+54 silly reify ]
+55 silly reify mark retired [
+55 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\object-assign'
+55 silly reify ]
+56 silly reify mark retired [
+56 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\process-nextick-args'
+56 silly reify ]
+57 silly reify mark retired [
+57 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\readable-stream'
+57 silly reify ]
+58 silly reify mark retired [
+58 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\string_decoder'
+58 silly reify ]
+59 silly reify mark retired [
+59 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\xtend'
+59 silly reify ]
+60 silly reify moves {
+60 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\concat-stream': 'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.concat-stream-i3LNPNFF',
+60 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\core-util-is': 'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.core-util-is-QUUgoRSD',
+60 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\isarray': 'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.isarray-xuNnfWII',
+60 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\minimist': 'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.minimist-d219M5NQ',
+60 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\mkdirp': 'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.mkdirp-UdalqWtq',
+60 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.bin\\mkdirp': 'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.bin\\.mkdirp-pKKJKNzt',
+60 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.bin\\mkdirp.cmd': 'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.bin\\.mkdirp.cmd-5nPlUJY0',
+60 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.bin\\mkdirp.ps1': 'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.bin\\.mkdirp.ps1-TWjo8Zku',
+60 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\multer': 'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.multer-RUFYtHsG',
+60 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\object-assign': 'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.object-assign-1CvFgCve',
+60 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\process-nextick-args': 'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.process-nextick-args-ulDOn9fK',
+60 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\readable-stream': 'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.readable-stream-1hM5yJSW',
+60 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\string_decoder': 'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.string_decoder-Ugmyj7Oy',
+60 silly reify   'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\xtend': 'C:\\Users\\ASUS\\Documents\\Codex\\2026-07-25\\smart-ai-assistant-lead-system-create\\node_modules\\.xtend-mNNZa1FA'
+60 silly reify }
+61 http cache string_decoder@https://registry.npmjs.org/string_decoder/-/string_decoder-1.3.0.tgz 0ms (cache hit)
+62 http cache readable-stream@https://registry.npmjs.org/readable-stream/-/readable-stream-3.6.2.tgz 1ms (cache hit)
+63 silly tarball no local data for string_decoder@https://registry.npmjs.org/string_decoder/-/string_decoder-1.3.0.tgz. Extracting by manifest.
+64 silly tarball no local data for readable-stream@https://registry.npmjs.org/readable-stream/-/readable-stream-3.6.2.tgz. Extracting by manifest.
+65 http cache concat-stream@https://registry.npmjs.org/concat-stream/-/concat-stream-2.0.0.tgz 0ms (cache hit)
+66 http cache multer@https://registry.npmjs.org/multer/-/multer-2.2.0.tgz 0ms (cache hit)
+67 silly tarball no local data for concat-stream@https://registry.npmjs.org/concat-stream/-/concat-stream-2.0.0.tgz. Extracting by manifest.
+68 silly tarball no local data for multer@https://registry.npmjs.org/multer/-/multer-2.2.0.tgz. Extracting by manifest.
+69 http fetch GET 200 https://registry.npmjs.org/concat-stream/-/concat-stream-2.0.0.tgz 453ms (cache miss)
+70 http fetch GET 200 https://registry.npmjs.org/string_decoder/-/string_decoder-1.3.0.tgz 489ms (cache miss)
+71 http fetch GET 200 https://registry.npmjs.org/multer/-/multer-2.2.0.tgz 522ms (cache miss)
+72 http fetch GET 200 https://registry.npmjs.org/readable-stream/-/readable-stream-3.6.2.tgz 557ms (cache miss)
+73 silly REMOVE node_modules/xtend
+74 silly CHANGE node_modules/string_decoder
+75 silly REMOVE node_modules/string_decoder/node_modules/safe-buffer
+76 silly CHANGE node_modules/readable-stream
+77 silly REMOVE node_modules/readable-stream/node_modules/safe-buffer
+78 silly REMOVE node_modules/process-nextick-args
+79 silly REMOVE node_modules/object-assign
+80 silly CHANGE node_modules/multer
+81 silly REMOVE node_modules/mkdirp
+82 silly REMOVE node_modules/minimist
+83 silly REMOVE node_modules/isarray
+84 silly REMOVE node_modules/core-util-is
+85 silly CHANGE node_modules/concat-stream
+86 verbose cwd C:\Users\ASUS\Documents\Codex\2026-07-25\smart-ai-assistant-lead-system-create
+87 verbose os Windows_NT 10.0.26200
+88 verbose node v24.14.0
+89 verbose npm  v11.9.0
+90 verbose exit 0
+91 info ok
