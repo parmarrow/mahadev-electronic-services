@@ -19,21 +19,39 @@ localStorage.setItem('mahadev-chat-session', state.chat.sessionId);
 
 const galleryData = {
   wash: {
-    before: "url('https://images.unsplash.com/photo-1585128903994-9788298939e1?auto=format&fit=crop&w=1600&q=85')",
-    after: "url('https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1600&q=85')",
+    before: "url('/images/washing-machine-repair.png')",
+    after: "url('/images/washing-machine-repair.png')",
     title: 'Restored with attention to detail.'
   },
   fridge: {
-    before: "url('https://images.unsplash.com/photo-1586208958839-06c17cacdf08?auto=format&fit=crop&w=1600&q=85')",
-    after: "url('https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?auto=format&fit=crop&w=1600&q=85')",
+    before: "url('/images/refrigerator-repair.png')",
+    after: "url('/images/refrigerator-repair.png')",
     title: 'A fresher, cooler kitchen again.'
   },
   ro: {
-    before: "url('https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=1600&q=85')",
-    after: "url('https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=1600&q=85')",
+    before: "url('/images/ro-repair.png')",
+    after: "url('/images/ro-repair.png')",
     title: 'Clean water care, beautifully done.'
   }
 };
+
+const whatsappNumber = '918141743871';
+
+function buildWhatsAppUrl(lead) {
+  const message = [
+    'Namaste Mahadev Service and Repair,',
+    'Mujhe appliance service chahiye.',
+    '',
+    `Name: ${lead.name || 'Not provided'}`,
+    `Phone: ${lead.phone || 'Not provided'}`,
+    `Appliance: ${lead.appliance || 'Not provided'}`,
+    `Brand: ${lead.brand || 'Not provided'}`,
+    `Problem: ${lead.problem || 'Not provided'}`,
+    `Area: ${lead.area || 'Not provided'}`,
+    'Source: Website booking form'
+  ].join('\n');
+  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+}
 
 function showToast(icon, title) {
   return swal.fire({ toast: true, position: 'top-end', icon, title, showConfirmButton: false, timer: 2800, timerProgressBar: true });
@@ -105,6 +123,23 @@ async function loadReviews() {
   }
 }
 
+function renderCustomerRatings(ratings) {
+  const list = document.getElementById('customer-rating-list');
+  list.innerHTML = ratings.length ? ratings.slice(0, 5).map((rating) => `<article class="customer-rating-item"><header><b>${escapeHtml(rating.name)}</b><span class="rating-stars">${'★'.repeat(Number(rating.rating || 0))}${'☆'.repeat(5 - Number(rating.rating || 0))}</span></header><p>${escapeHtml(rating.text || 'No comment shared.')}</p></article>`).join('') : '<p>Be the first customer to share a rating.</p>';
+}
+
+async function loadCustomerRatings() {
+  try {
+    const result = await request('/api/ratings');
+    const average = Number(result.averageRating || 0);
+    document.getElementById('customer-rating-average').textContent = result.totalRatings ? average.toFixed(1) : '—';
+    document.getElementById('customer-rating-count').textContent = result.totalRatings ? `${result.totalRatings} customer rating${result.totalRatings === 1 ? '' : 's'}` : 'No ratings yet';
+    renderCustomerRatings(result.ratings || []);
+  } catch (_error) {
+    document.getElementById('customer-rating-list').innerHTML = '<p>Ratings will appear here after the service database is connected.</p>';
+  }
+}
+
 function youtubeEmbedUrl(url) {
   try {
     const parsed = new URL(url);
@@ -120,7 +155,8 @@ async function loadVideos() {
   const grid = document.getElementById('video-grid');
   try {
     const videos = await request('/api/videos');
-    grid.innerHTML = videos.slice(0, 4).map((video, index) => `<article class="video-card" style="--video-cover:url('https://images.unsplash.com/photo-${index % 2 ? '1585128903994-9788298939e1' : '1621905252507-b35492cc74b4'}?auto=format&fit=crop&w=900&q=80')"><div class="video-content"><h3>${escapeHtml(video.title)}</h3><button class="play-video" data-type="${escapeHtml(video.type)}" data-url="${escapeHtml(video.url)}" aria-label="Play ${escapeHtml(video.title)}">▶</button></div></article>`).join('');
+    const covers = ['/images/washing-machine-repair.png', '/images/refrigerator-repair.png', '/images/ro-repair.png'];
+    grid.innerHTML = videos.slice(0, 4).map((video, index) => `<article class="video-card" style="--video-cover:url('${covers[index % covers.length]}')"><div class="video-content"><h3>${escapeHtml(video.title)}</h3><button class="play-video" data-type="${escapeHtml(video.type)}" data-url="${escapeHtml(video.url)}" aria-label="Play ${escapeHtml(video.title)}">▶</button></div></article>`).join('');
   } catch (_error) {
     grid.innerHTML = '<p class="video-loading">Videos are temporarily unavailable. Please check back soon.</p>';
   }
@@ -326,18 +362,46 @@ document.addEventListener('DOMContentLoaded', () => {
     event.preventDefault();
     const form = event.currentTarget;
     const submit = form.querySelector('button[type="submit"]');
+    const payload = { ...Object.fromEntries(new FormData(form)), source: 'quick-booking' };
+    const whatsappWindow = window.open('about:blank', '_blank');
     submit.disabled = true;
-    submit.innerHTML = 'Sending request…';
+    submit.innerHTML = 'Saving request…';
     try {
-      await request('/api/leads', { method: 'POST', body: JSON.stringify({ ...Object.fromEntries(new FormData(form)), source: 'quick-booking' }) });
+      await request('/api/leads', { method: 'POST', body: JSON.stringify(payload) });
+      const whatsappUrl = buildWhatsAppUrl(payload);
+      if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
+      else window.location.href = whatsappUrl;
       form.reset();
       closeBooking();
-      swal.fire({ icon: 'success', title: 'Booking request received!', text: 'Our service team will call you shortly to confirm your visit.', confirmButtonText: 'Perfect' });
+      swal.fire({ icon: 'success', title: 'Request saved!', text: 'WhatsApp is opening with your service details ready to send.', confirmButtonText: 'Perfect' });
     } catch (error) {
-      swal.fire({ icon: 'error', title: 'Couldn’t send your request', text: error.message, confirmButtonText: 'Try again' });
+      if (whatsappWindow) whatsappWindow.close();
+      const message = error.message === 'Failed to fetch'
+        ? 'Website server se connection nahi ho rahi. Node.js server aur MONGODB_URI check karke dobara try karein.'
+        : error.message;
+      swal.fire({ icon: 'error', title: 'Request save nahi hui', text: message, confirmButtonText: 'Try again' });
     } finally {
       submit.disabled = false;
-      submit.innerHTML = 'Request a callback <span>→</span>';
+      submit.innerHTML = 'Save &amp; WhatsApp details <span>→</span>';
+    }
+  });
+
+  document.getElementById('rating-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const submit = form.querySelector('button[type="submit"]');
+    submit.disabled = true;
+    submit.textContent = 'Saving rating…';
+    try {
+      await request('/api/ratings', { method: 'POST', body: JSON.stringify(Object.fromEntries(new FormData(form))) });
+      form.reset();
+      await loadCustomerRatings();
+      swal.fire({ icon: 'success', title: 'Thank you!', text: 'Your rating has been saved.', confirmButtonText: 'Done' });
+    } catch (error) {
+      swal.fire({ icon: 'error', title: 'Rating save nahi hui', text: error.message, confirmButtonText: 'Try again' });
+    } finally {
+      submit.disabled = false;
+      submit.innerHTML = 'Submit rating <span>→</span>';
     }
   });
 
@@ -359,6 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { closeBooking(); closeVideo(); chatClose(); } });
   loadReviews();
+  loadCustomerRatings();
   loadVideos();
   checkNotifications();
   window.setInterval(checkNotifications, 30000);

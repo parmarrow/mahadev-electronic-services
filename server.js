@@ -6,7 +6,6 @@ const path = require('path');
 const express = require('express');
 const multer = require('multer');
 const { MongoClient, ObjectId } = require('mongodb');
-const nodemailer = require('nodemailer');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -27,7 +26,8 @@ const fallbackReviews = [
 ];
 
 let db;
-let mailer;
+const adminSessionTtlMs = 12 * 60 * 60 * 1000;
+const defaultVisitCharge = 250;
 
 function collection(name) {
   if (!db) throw new Error('Database is not connected. Set MONGODB_URI and restart the app.');
@@ -44,9 +44,43 @@ function serialize(document) {
   return { id: _id?.toString(), ...rest };
 }
 
+function secretsMatch(value, expected) {
+  if (!value || !expected) return false;
+  const actualBuffer = Buffer.from(String(value));
+  const expectedBuffer = Buffer.from(String(expected));
+  return actualBuffer.length === expectedBuffer.length && crypto.timingSafeEqual(actualBuffer, expectedBuffer);
+}
+
+function adminSecret() {
+  return process.env.ADMIN_TOKEN || process.env.ADMIN_PASSWORD || '';
+}
+
+function createAdminSession(username) {
+  const payload = Buffer.from(JSON.stringify({
+    username,
+    expiresAt: Date.now() + adminSessionTtlMs
+  })).toString('base64url');
+  const signature = crypto.createHmac('sha256', adminSecret()).update(payload).digest('base64url');
+  return `${payload}.${signature}`;
+}
+
+function isValidAdminSession(token) {
+  const [payload, signature] = String(token || '').split('.');
+  if (!payload || !signature || !adminSecret()) return false;
+  const expectedSignature = crypto.createHmac('sha256', adminSecret()).update(payload).digest('base64url');
+  if (!secretsMatch(signature, expectedSignature)) return false;
+  try {
+    const session = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
+    return session.expiresAt > Date.now();
+  } catch (_error) {
+    return false;
+  }
+}
+
 function requireAdmin(request, response, next) {
-  const adminToken = process.env.ADMIN_TOKEN;
-  if (!adminToken || request.header('x-admin-token') !== adminToken) {
+  const providedToken = request.header('x-admin-token') || request.header('authorization')?.replace(/^Bearer\s+/i, '');
+  const legacyToken = process.env.ADMIN_TOKEN;
+  if ((!legacyToken || !secretsMatch(providedToken, legacyToken)) && !isValidAdminSession(providedToken)) {
     return response.status(401).json({ error: 'Admin access is required.' });
   }
   return next();
@@ -54,26 +88,6 @@ function requireAdmin(request, response, next) {
 
 function clean(value, max = 240) {
   return String(value || '').trim().slice(0, max);
-}
-
-async function sendLeadEmail(lead) {
-  if (!mailer || !process.env.ADMIN_EMAIL) return;
-  const rows = [
-    ['Customer', lead.name || 'Not provided'],
-    ['Phone', lead.phone],
-    ['Appliance', lead.appliance],
-    ['Brand', lead.brand || 'Not provided'],
-    ['Problem', lead.problem || 'Not provided'],
-    ['Area', lead.area],
-    ['Source', lead.source]
-  ].map(([key, value]) => `<tr><td style="padding:6px 12px;font-weight:700">${key}</td><td style="padding:6px 12px">${value}</td></tr>`).join('');
-
-  await mailer.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER,
-    to: process.env.ADMIN_EMAIL,
-    subject: `New ${lead.appliance} lead — ${lead.phone}`,
-    html: `<h2>New service lead</h2><table>${rows}</table>`
-  });
 }
 
 async function createLead(request, response) {
@@ -96,7 +110,6 @@ async function createLead(request, response) {
     }
 
     const result = await collection('leads').insertOne(lead);
-    sendLeadEmail(lead).catch((error) => console.error('Lead email failed:', error.message));
     return response.status(201).json({ lead: serialize({ _id: result.insertedId, ...lead }) });
   } catch (error) {
     console.error('Lead creation failed:', error.message);
@@ -107,6 +120,18 @@ async function createLead(request, response) {
 app.use(express.json({ limit: '1mb' }));
 app.use('/uploads', express.static(uploadsDir));
 app.use(express.static(publicDir));
+
+app.post('/api/admin/login', (request, response) => {
+  const username = clean(request.body.username, 80);
+  const password = String(request.body.password || '');
+  const expectedUsername = process.env.ADMIN_USERNAME || 'admin';
+  const expectedPassword = process.env.ADMIN_PASSWORD || process.env.ADMIN_TOKEN || '';
+  if (!expectedPassword) return response.status(503).json({ error: 'Admin login is not configured on the server.' });
+  if (!secretsMatch(username, expectedUsername) || !secretsMatch(password, expectedPassword)) {
+    return response.status(401).json({ error: 'Invalid admin username or password.' });
+  }
+  return response.json({ token: createAdminSession(username), expiresIn: adminSessionTtlMs });
+});
 
 app.post('/api/leads', createLead);
 
@@ -156,6 +181,44 @@ app.get('/api/reviews', async (_request, response) => {
   }
 });
 
+app.get('/api/ratings', async (_request, response) => {
+  try {
+    const [ratings, summary] = await Promise.all([
+      collection('ratings').find({}).sort({ createdAt: -1 }).limit(30).toArray(),
+      collection('ratings').aggregate([{ $group: { _id: null, averageRating: { $avg: '$rating' }, totalRatings: { $sum: 1 } } }]).next()
+    ]);
+    return response.json({
+      averageRating: Number(summary?.averageRating || 0),
+      totalRatings: summary?.totalRatings || 0,
+      ratings: ratings.map(serialize)
+    });
+  } catch (error) {
+    console.error('Customer ratings request failed:', error.message);
+    return response.status(503).json({ error: 'Customer ratings are unavailable right now.' });
+  }
+});
+
+app.post('/api/ratings', async (request, response) => {
+  const ratingValue = Number(request.body.rating);
+  const rating = {
+    name: clean(request.body.name, 100),
+    rating: Number.isInteger(ratingValue) ? ratingValue : 0,
+    text: clean(request.body.comment, 500),
+    createdAt: new Date(),
+    source: 'website'
+  };
+  if (!rating.name || rating.rating < 1 || rating.rating > 5) {
+    return response.status(422).json({ error: 'Name and a rating from 1 to 5 are required.' });
+  }
+  try {
+    const result = await collection('ratings').insertOne(rating);
+    return response.status(201).json({ rating: serialize({ _id: result.insertedId, ...rating }) });
+  } catch (error) {
+    console.error('Customer rating save failed:', error.message);
+    return response.status(503).json({ error: 'Your rating could not be saved right now.' });
+  }
+});
+
 app.get('/api/videos', async (_request, response) => {
   const defaults = [
     { id: 'care-tips', title: 'How to keep a front-load washer fresh', type: 'youtube', url: 'https://www.youtube.com/embed/THgLUP3EGEw' },
@@ -182,15 +245,47 @@ app.get('/api/notifications/latest', async (request, response) => {
 
 app.get('/api/admin/dashboard', requireAdmin, async (_request, response) => {
   try {
-    const [leads, conversations, notifications, videos] = await Promise.all([
+    const monthStart = new Date();
+    monthStart.setHours(0, 0, 0, 0);
+    monthStart.setDate(1);
+    const [leads, conversations, notifications, videos, totalOrders, monthlyOrders, statusSummary, areaSummary, ratingSummary, ratings] = await Promise.all([
       collection('leads').find({}).sort({ createdAt: -1 }).limit(100).toArray(),
       collection('conversations').countDocuments(),
       collection('notifications').find({}).sort({ createdAt: -1 }).limit(10).toArray(),
-      collection('videos').find({}).sort({ createdAt: -1 }).limit(20).toArray()
+      collection('videos').find({}).sort({ createdAt: -1 }).limit(20).toArray(),
+      collection('leads').countDocuments(),
+      collection('leads').countDocuments({ createdAt: { $gte: monthStart } }),
+      collection('leads').aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]).toArray(),
+      collection('leads').aggregate([
+        { $match: { area: { $exists: true, $ne: '' } } },
+        { $group: { _id: '$area', count: { $sum: 1 } } },
+        { $sort: { count: -1, _id: 1 } }
+      ]).toArray(),
+      collection('ratings').aggregate([{ $group: { _id: null, averageRating: { $avg: '$rating' }, totalRatings: { $sum: 1 } } }]).next(),
+      collection('ratings').find({}).sort({ createdAt: -1 }).limit(20).toArray()
     ]);
-    const counts = leads.reduce((current, lead) => ({ ...current, [lead.status]: (current[lead.status] || 0) + 1 }), {});
-    return response.json({ leads: leads.map(serialize), conversations, notifications: notifications.map(serialize), videos: videos.map(serialize), counts });
+    const counts = statusSummary.reduce((current, item) => ({ ...current, [item._id]: item.count }), {});
+    const configuredVisitCharge = Number(process.env.VISIT_CHARGE);
+    const visitCharge = Number.isFinite(configuredVisitCharge) && configuredVisitCharge >= 0 ? configuredVisitCharge : defaultVisitCharge;
+    return response.json({
+      leads: leads.map(serialize),
+      conversations,
+      notifications: notifications.map(serialize),
+      videos: videos.map(serialize),
+      ratings: ratings.map(serialize),
+      counts,
+      areaBreakdown: areaSummary.map((item) => ({ area: item._id, orders: item.count })),
+      metrics: {
+        totalOrders,
+        monthlyOrders,
+        visitCharge,
+        monthlyIncome: monthlyOrders * visitCharge,
+        averageRating: Number(ratingSummary?.averageRating || 0),
+        totalRatings: ratingSummary?.totalRatings || 0
+      }
+    });
   } catch (error) {
+    console.error('Dashboard request failed:', error.message);
     return response.status(503).json({ error: 'Dashboard data is unavailable. Check MongoDB connection.' });
   }
 });
@@ -235,30 +330,31 @@ app.post('/api/admin/videos', requireAdmin, upload.single('video'), async (reque
   }
 });
 
-async function start() {
-  if (process.env.MONGODB_URI) {
-    try {
-      const client = new MongoClient(process.env.MONGODB_URI);
-      await client.connect();
-      db = client.db(process.env.MONGODB_DB || 'mahadev_smart_services');
-      await Promise.all([
-        collection('leads').createIndex({ createdAt: -1 }),
-        collection('conversations').createIndex({ sessionId: 1 }, { unique: true }),
-        collection('notifications').createIndex({ createdAt: -1 })
-      ]);
-      console.log('MongoDB connected.');
-    } catch (error) {
-      console.error('MongoDB connection failed:', error.message);
-    }
-  } else {
+async function connectDatabase() {
+  if (!process.env.MONGODB_URI) {
     console.warn('MONGODB_URI is not set. Lead and chat persistence will be unavailable.');
+    return;
   }
 
-  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-    mailer = nodemailer.createTransport({ host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT || 587), secure: Number(process.env.SMTP_PORT) === 465, auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } });
+  try {
+    const client = new MongoClient(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
+    await client.connect();
+    db = client.db(process.env.MONGODB_DB || 'mahadev_smart_services');
+    await Promise.all([
+      collection('leads').createIndex({ createdAt: -1 }),
+      collection('conversations').createIndex({ sessionId: 1 }, { unique: true }),
+      collection('notifications').createIndex({ createdAt: -1 }),
+      collection('ratings').createIndex({ createdAt: -1 })
+    ]);
+    console.log('MongoDB connected.');
+  } catch (error) {
+    console.error('MongoDB connection failed:', error.message);
   }
+}
 
+function start() {
   app.listen(port, () => console.log(`Mahadev Smart Assistant running on http://localhost:${port}`));
+  connectDatabase();
 }
 
 start();
