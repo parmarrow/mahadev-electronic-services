@@ -344,13 +344,25 @@ async function checkNotifications() {
   try {
     const result = await request(`/api/notifications/latest?after=${encodeURIComponent(after)}`);
     if (result.notification) {
-      new Notification(result.notification.title, { body: result.notification.body, icon: '/favicon.ico' });
+      new Notification(result.notification.title, { body: result.notification.body, icon: '/favicon.svg' });
       localStorage.setItem('mahadev-last-notification', result.notification.createdAt);
     }
   } catch (_error) { }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  const siteHeader = document.querySelector('.site-header');
+  const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+  mobileMenuToggle.addEventListener('click', () => {
+    const isOpen = siteHeader.classList.toggle('menu-open');
+    mobileMenuToggle.setAttribute('aria-expanded', String(isOpen));
+    mobileMenuToggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+  });
+  siteHeader.querySelectorAll('nav a').forEach((link) => link.addEventListener('click', () => {
+    siteHeader.classList.remove('menu-open');
+    mobileMenuToggle.setAttribute('aria-expanded', 'false');
+    mobileMenuToggle.setAttribute('aria-label', 'Open menu');
+  }));
   document.querySelectorAll('.open-booking').forEach((button) => button.addEventListener('click', () => openBooking()));
   document.querySelectorAll('.close-booking').forEach((button) => button.addEventListener('click', closeBooking));
   document.querySelectorAll('.service-select').forEach((button) => button.addEventListener('click', () => openBooking(button.dataset.appliance)));
