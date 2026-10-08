@@ -1,0 +1,18 @@
+{
+  "name": "mahadev-smart-assistant",
+  "version": "1.0.0",
+  "description": "AI customer assistant and lead management system for appliance services",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js",
+    "check": "node --check server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongodb": "^6.12.0",
+    "multer": "^2.0.2",
+    "nodemailer": "^6.9.16"
+  }
+}
